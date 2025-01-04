@@ -11,10 +11,13 @@ on:
 jobs:
   build-aseprite:
     name: Build Aseprite
-    runs-on: windows-latest  # 只在 Windows 上运行
+    runs-on: windows-latest
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
+
+      - name: Debug directory
+        run: ls
 
       - name: Install dependencies
         run: |
