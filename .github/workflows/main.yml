@@ -1,4 +1,4 @@
-name: Build Aseprite
+name: Build Aseprite on Windows
 
 on:
   push:
@@ -9,35 +9,32 @@ on:
       - main
 
 jobs:
-  build:
-    runs-on: ubuntu-latest
-
+  build-aseprite:
+    name: Build Aseprite
+    runs-on: windows-latest  # 只在 Windows 上运行
     steps:
-    - name: Checkout repository
-      uses: actions/checkout@v3
+      - name: Checkout repository
+        uses: actions/checkout@v3
 
-    - name: Install dependencies
-      uses: mattnotmitt/install-apt-packages-action@v1
-      with:
-        packages: |
-          libx11-dev
-          libxcursor-dev
-          libxi-dev
-          libgl1-mesa-dev
-          libfontconfig1-dev
+      - name: Install dependencies
+        run: |
+          choco install cmake -y
+          choco install ninja -y
 
-    - name: Setup CMake
-      uses: actions/setup-cmake@v3
+      - name: Set up MSVC (Visual Studio)
+        uses: ilammy/msvc-dev-cmd@v1
+        with:
+          arch: x64
 
-    - name: Build Aseprite
-      run: |
-        mkdir build
-        cd build
-        cmake -DCMAKE_BUILD_TYPE=Release ..
-        make -j$(nproc)
+      - name: Build Aseprite
+        run: |
+          mkdir build
+          cd build
+          cmake -G "Ninja" -DCMAKE_BUILD_TYPE=Release ..
+          ninja
 
-    - name: Upload Artifact
-      uses: actions/upload-artifact@v3
-      with:
-        name: aseprite
-        path: build/bin/aseprite
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: aseprite-windows
+          path: build/bin/aseprite.exe
